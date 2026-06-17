@@ -256,7 +256,7 @@
   <div class="wrap">
     <div class="sec-head">
       <span class="eyebrow">Live agent — every channel</span>
-      <h2 style="margin-top:9px">Type to it. It answers, qualifies and books — <span class="serif">like a real person.</span></h2>
+      <h2 style="margin-top:9px">Type to it. It answers, qualifies and books <span class="serif">like a real person.</span></h2>
       <p>This is the real agent built for TSCR. Switch the channel; the same conversation can follow the customer wherever they message from.</p>
     </div>
 
@@ -310,7 +310,7 @@
         <div class="whenbox">
           <div class="q">Be honest — when the phone last rang, what were you doing?</div>
           <div class="whenchips" id="whenchips">
-            <button class="chip" data-l="Thought so 😏 — that one went to voicemail.">On a job</button>
+            <button class="chip" data-l="Thought so 😏.">On a job</button>
             <button class="chip" data-l="With a customer, so the next caller got voicemail. That's the leak.">With a customer</button>
             <button class="chip" data-l="Driving — can't exactly take a quote at 70mph. The agent could've.">Driving</button>
             <button class="chip" data-l="Out on a quote, while another one rang out. Adriana would've caught it.">Quoting</button>
@@ -413,7 +413,7 @@ function fallback(raw){
   const t=raw.toLowerCase();
   if(/(book|quote|appointment|visit)/.test(t)) return "Of course — I can get a free quotation booked in. Could I take your full name to start?";
   if(/(price|cost|how much)/.test(t)) return "Every project's unique, so we quote on the property — fixed price, no hidden costs. Want me to book a free quotation for an exact figure?";
-  if(/(area|cover|where|location)/.test(t)) return "We cover all of North London — Barnet, Enfield, Harrow, Finchley, Herts and Essex. Whereabouts are you?";
+  if(/(area|cover|where|location)/.test(t)) return "We cover all of North London; Barnet, Enfield, Harrow, Finchley, Herts and Essex. Whereabouts are you?";
   if(/(hour|open|when|availab)/.test(t)) return "We're open Mon 9–7 and Tue–Fri 8–7, closed weekends. I can usually book a quotation within a few days — shall I?";
   return "Happy to help with that — the easiest thing is a free quotation so we can take a proper look. Want me to book one in?";
 }
