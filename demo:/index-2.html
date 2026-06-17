@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Prisync — Live Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Inter:wght@400;500;600&family=Fraunces:ital,opsz,wght@1,9..144,500;1,9..144,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --navy:#0a2242; --navy-deep:#06152c; --card:#0f2b54; --card2:#143667;
+    --stage:#16407a; --stage2:#1b4a8c;
+    --blue:#3b91cf; --blue-bright:#5aa9e0; --blue-soft:rgba(59,145,207,.16);
+    --white:#ffffff; --muted:#b9cae0; --dim:#8fa6c4; --line:rgba(255,255,255,.10);
+    --red:#f0788c; --green:#34c759;
+    --maxw:1240px; --pad:clamp(16px,4vw,40px);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--navy);color:var(--white);font-family:'Inter',system-ui,sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 var(--pad)}
+  .mono{font-family:'JetBrains Mono',monospace}
+  .serif{font-family:'Fraunces',serif;font-style:italic;font-weight:600}
+  h1,h2,h3{font-family:'Sora',sans-serif;font-weight:600;letter-spacing:-.02em;line-height:1.1}
+  .eyebrow{font-family:'JetBrains Mono',monospace;font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:var(--blue-bright)}
+  button{font-family:inherit;cursor:pointer;border:none}
+  input{font-family:inherit}
+
+  /* TOP BAR */
+  .topbar{background:var(--navy-deep);border-bottom:1px solid var(--line);padding:18px 0}
+  .topbrow{display:flex;align-items:center;justify-content:space-between;gap:18px}
+  .brand{font-family:'JetBrains Mono',monospace;font-size:.74rem;letter-spacing:.14em;color:var(--dim)}
+  .brand b{color:var(--blue)}
+  .namebox{display:flex;align-items:center;gap:10px}
+  .namebox label{font-family:'JetBrains Mono';font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);white-space:nowrap}
+  .namebox input{background:var(--card);border:1px solid var(--line);color:var(--white);padding:9px 13px;border-radius:9px;font-size:.9rem;min-width:200px}
+  .namebox input:focus{outline:2px solid var(--blue);outline-offset:1px;border-color:var(--blue)}
+
+  .hero{padding:36px 0 30px}
+  .hero .demo-for{font-family:'Sora';font-weight:800;font-size:clamp(1.9rem,4.2vw,3.1rem);letter-spacing:-.03em}
+  .hero .demo-for .x{color:var(--blue-bright)}
+  .hero .built{margin-top:14px;color:var(--muted);font-size:1rem}
+  .hero .built .tsc{color:var(--white);font-weight:600}
+
+  /* LEAK STRIP */
+  .leakstrip{background:linear-gradient(90deg,rgba(240,120,140,.14),transparent 70%);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:18px 0}
+  .leakstrip .wrap{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline}
+  .leakstrip .big{font-family:'Sora';font-weight:600;font-size:clamp(1.05rem,2vw,1.35rem)}
+  .leakstrip b{color:var(--red)}
+  .leakstrip .serif{color:var(--blue-bright);font-size:1.05em}
+  .leakstrip .sub{width:100%;color:var(--dim);font-family:'JetBrains Mono';font-size:.72rem;letter-spacing:.04em;margin-top:4px}
+
+  section{padding:clamp(36px,5vw,64px) 0}
+  .sec-head{margin-bottom:24px;max-width:64ch}
+  .sec-head h2{font-size:clamp(1.5rem,2.8vw,2.1rem)}
+  .sec-head p{color:var(--muted);margin-top:9px}
+  .sec-head .serif{color:var(--blue-bright)}
+
+  /* CHANNEL TABS */
+  .channels{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+  .ch-tab{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);color:var(--muted);padding:9px 15px;border-radius:11px;font-size:.86rem;font-weight:500;transition:.15s}
+  .ch-tab:hover{color:var(--white);border-color:var(--blue)}
+  .ch-tab.active{background:var(--blue);color:#04101f;border-color:var(--blue);font-weight:600}
+  .ch-tab svg{width:16px;height:16px;display:block}
+
+  /* FULL-WIDTH STAGE */
+  .stagewrap{background:linear-gradient(180deg,var(--stage),var(--stage2));border:1px solid rgba(90,169,224,.3);border-radius:20px;padding:clamp(14px,2vw,26px);box-shadow:0 40px 90px -50px rgba(0,0,0,.7)}
+  .stage{min-height:600px;display:flex;justify-content:center}
+
+  /* browser (web) — wide */
+  .browser{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 30px 60px -28px rgba(0,0,0,.55);height:600px;width:100%;display:flex;flex-direction:column;position:relative}
+  .browser-bar{background:#e9eef3;padding:10px 14px;display:flex;align-items:center;gap:7px;flex:0 0 auto}
+  .browser-bar i{width:11px;height:11px;border-radius:50%;background:#c3ccd6}
+  .browser-url{margin-left:10px;background:#fff;border-radius:6px;padding:6px 14px;font-size:.76rem;color:#5a6b7d;font-family:'JetBrains Mono'}
+  .site{flex:1;overflow-y:auto;background:#fff;color:#0a2242}
+  .site-nav{display:flex;align-items:center;justify-content:space-between;padding:16px 30px;border-bottom:1px solid #eef2f6;position:sticky;top:0;background:#fff;z-index:2}
+  .site-nav .logo{font-family:'Sora';font-weight:700;font-size:1.1rem}
+  .site-nav .logo span{color:#b8893a}
+  .site-nav .menu{display:flex;gap:20px;font-size:.82rem;color:#5a6b7d}
+  .site-hero{padding:48px 30px;background:linear-gradient(135deg,#0a2242,#15396b);color:#fff}
+  .site-hero .badge{font-family:'JetBrains Mono';font-size:.64rem;letter-spacing:.12em;text-transform:uppercase;color:#9fc3e6}
+  .site-hero h2{font-size:2.2rem;margin:10px 0 12px;color:#fff;max-width:16ch}
+  .site-hero p{color:#cdddee;font-size:.98rem;max-width:46ch}
+  .site-hero .btns{margin-top:20px;display:flex;gap:11px}
+  .site-hero .btns a{font-size:.84rem;font-weight:600;padding:11px 20px;border-radius:8px}
+  .site-hero .b1{background:#fff;color:#0a2242}.site-hero .b2{border:1px solid rgba(255,255,255,.4);color:#fff}
+  .site-trust{display:flex;flex-wrap:wrap;gap:10px 26px;padding:16px 30px;background:#f4f7fa;font-size:.78rem;color:#48586a;font-weight:600}
+  .site-trust span{display:flex;align-items:center;gap:7px}.site-trust .tick{color:#2e8b57}
+  .site-services{padding:28px 30px}.site-services h3{font-size:1.2rem;margin-bottom:16px}
+  .svc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  .svc{border:1px solid #eef2f6;border-radius:11px;padding:16px}
+  .svc b{font-size:.92rem;display:block;margin-bottom:5px}.svc p{font-size:.78rem;color:#5a6b7d}
+  .site-foot{padding:22px 30px;background:#0a2242;color:#9fb4d0;font-size:.76rem}
+
+  .widget{position:absolute;right:22px;bottom:22px;width:360px;max-width:calc(100% - 44px);background:#fff;border-radius:16px;box-shadow:0 28px 70px -16px rgba(10,34,66,.5);overflow:hidden;display:flex;flex-direction:column;border:1px solid #e6ecf2;z-index:5}
+  .widget-head{background:#0a2242;color:#fff;padding:14px 16px;display:flex;align-items:center;gap:12px}
+  .widget-head .av,.app-head .av,.callphone-in .cav{font-family:'Sora';font-weight:700}
+  .widget-head .av{width:36px;height:36px;border-radius:50%;background:#3b91cf;display:flex;align-items:center;justify-content:center;font-size:.9rem;color:#04101f}
+  .widget-head .nm{font-family:'Sora';font-weight:600;font-size:.95rem}
+  .widget-head .st{font-size:.68rem;color:#9fc3e6;display:flex;align-items:center;gap:5px}
+  .widget-head .st i{width:6px;height:6px;border-radius:50%;background:#34c759}
+
+  .phoneframe{margin:0 auto;width:370px;max-width:100%;background:#000;border-radius:42px;padding:12px;box-shadow:0 30px 60px -26px rgba(0,0,0,.7);height:600px}
+  .phone-inner{background:#fff;border-radius:32px;overflow:hidden;height:100%;display:flex;flex-direction:column}
+  .app-head{padding:15px 16px;display:flex;align-items:center;gap:12px;flex:0 0 auto}
+  .app-head .av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.82rem}
+  .app-head .nm{font-weight:600;font-size:.95rem}.app-head .st{font-size:.68rem;opacity:.8}
+
+  .emailframe{background:#fff;border-radius:12px;overflow:hidden;height:600px;width:100%;display:flex;flex-direction:column;color:#202124}
+  .email-bar{background:#f6f8fc;padding:13px 18px;border-bottom:1px solid #e6e9ee;font-size:.85rem;color:#5f6368;font-weight:600}
+  .email-subj{padding:16px 18px 8px;font-size:1.05rem;font-weight:600}
+
+  .thread{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px}
+  .msg{max-width:78%;padding:10px 14px;border-radius:16px;font-size:.88rem;line-height:1.45;word-wrap:break-word;animation:pop .25s ease;white-space:pre-wrap}
+  @keyframes pop{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .msg.bot{align-self:flex-start;border-bottom-left-radius:5px}
+  .msg.user{align-self:flex-end;border-bottom-right-radius:5px}
+  .composer{flex:0 0 auto;display:flex;gap:8px;padding:12px;border-top:1px solid #eceff3;background:#fff}
+  .composer input{flex:1;border:1px solid #dbe2ea;border-radius:22px;padding:11px 16px;font-size:.88rem;color:#0a2242;outline:none}
+  .composer input:focus{border-color:#3b91cf}
+  .composer button{background:#3b91cf;color:#04101f;border-radius:50%;width:40px;height:40px;font-size:1.05rem;font-weight:700;flex:0 0 auto}
+  .typing{align-self:flex-start;padding:12px 15px;border-radius:16px;border-bottom-left-radius:5px;background:#eef1f4}
+  .typing span{display:inline-block;width:6px;height:6px;border-radius:50%;background:#9aa7b5;margin:0 1px;animation:blink 1.2s infinite}
+  .typing span:nth-child(2){animation-delay:.2s}.typing span:nth-child(3){animation-delay:.4s}
+  @keyframes blink{0%,60%,100%{opacity:.3}30%{opacity:1}}
+
+  .web .msg.bot{background:#eef1f5;color:#0a2242}.web .msg.user{background:#0a2242;color:#fff}
+  .whatsapp .phone-inner,.whatsapp .thread{background:#ECE5DD}
+  .whatsapp .app-head{background:#075E54;color:#fff}.whatsapp .app-head .av{background:#128C7E;color:#fff}
+  .whatsapp .msg.bot{background:#fff;color:#111}.whatsapp .msg.user{background:#DCF8C6;color:#111}
+  .whatsapp .composer{background:#F0F0F0}.whatsapp .composer button{background:#128C7E;color:#fff}
+  .instagram .app-head{background:#fff;color:#262626;border-bottom:1px solid #efefef}
+  .instagram .app-head .av{background:linear-gradient(45deg,#f09433,#dc2743,#bc1888);color:#fff}
+  .instagram .msg.bot{background:#efefef;color:#262626}.instagram .msg.user{background:linear-gradient(45deg,#7b2ff7,#2f80ed);color:#fff}
+  .instagram .composer button{background:#dc2743;color:#fff}
+  .messenger .app-head{background:#fff;color:#050505;border-bottom:1px solid #eee}.messenger .app-head .av{background:#0084FF;color:#fff}
+  .messenger .msg.bot{background:#f0f0f0;color:#050505}.messenger .msg.user{background:#0084FF;color:#fff}
+  .messenger .composer button{background:#0084FF;color:#fff}
+  .sms .app-head{background:#f7f7f7;color:#000;border-bottom:1px solid #e3e3e3}.sms .app-head .av{background:#34c759;color:#fff}
+  .sms .msg.bot{background:#E9E9EB;color:#000}.sms .msg.user{background:#1982FC;color:#fff}
+  .sms .composer button{background:#1982FC;color:#fff}
+  .gmail .msg{max-width:100%;border-radius:9px}.gmail .msg.bot{background:#f1f3f4;color:#202124}.gmail .msg.user{background:#e8f0fe;color:#202124}
+  .gmail .composer button{background:#1a73e8;color:#fff}
+
+  /* PHONE SECTION */
+  .callgrid{display:grid;grid-template-columns:340px 1fr;gap:34px;align-items:center}
+  .callphone{background:#000;border-radius:34px;padding:11px;width:300px;margin:0 auto}
+  .callphone-in{background:linear-gradient(180deg,#1c1c1e,#000);border-radius:25px;padding:34px 22px 26px;text-align:center;color:#fff}
+  .callphone-in .inc{font-size:.72rem;color:#aaa;letter-spacing:.05em}
+  .callphone-in .cav{width:74px;height:74px;border-radius:50%;background:#3b91cf;margin:16px auto 12px;display:flex;align-items:center;justify-content:center;font-size:1.7rem;color:#04101f;animation:ring 1.6s infinite}
+  @keyframes ring{0%,100%{box-shadow:0 0 0 0 rgba(59,145,207,.5)}50%{box-shadow:0 0 0 16px rgba(59,145,207,0)}}
+  .callphone-in .cnm{font-family:'Sora';font-weight:600;font-size:1.3rem}
+  .callphone-in .cco{font-size:.78rem;color:#9fc3e6;margin-top:3px}
+  .callphone-in .cnum{font-family:'JetBrains Mono';font-size:1rem;margin-top:18px;letter-spacing:.03em}
+  .callphone-in .actions{display:flex;justify-content:center;gap:30px;margin-top:22px}
+  .callphone-in .act{width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.3rem}
+  .act.dec{background:#ff3b30}.act.acc{background:#34c759}
+  .callnote{font-family:'JetBrains Mono';font-size:.7rem;color:var(--dim);text-align:center;line-height:1.5;margin-top:14px}
+  .calltext h3{font-size:1.5rem;margin-bottom:8px}
+  .calltext .lead{color:var(--muted);font-size:1rem;margin-bottom:20px;max-width:46ch}
+  .calltext .lead .serif{color:var(--blue-bright)}
+  .listen{list-style:none;display:flex;flex-direction:column;gap:10px;margin-bottom:22px}
+  .listen li{font-size:.95rem;color:var(--white);display:flex;gap:11px;align-items:flex-start}
+  .listen li::before{content:"→";color:var(--blue-bright);font-family:'JetBrains Mono'}
+  .whenbox{border-top:1px solid var(--line);padding-top:18px}
+  .whenbox .q{font-size:.9rem;color:var(--muted);margin-bottom:10px}
+  .whenchips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{background:var(--card);border:1px solid var(--line);color:var(--muted);padding:8px 14px;border-radius:20px;font-size:.84rem;transition:.15s}
+  .chip:hover{color:var(--white);border-color:var(--blue)}
+  .chip.active{background:var(--blue-soft);color:var(--white);border-color:var(--blue)}
+  .whenline{margin-top:14px;font-family:'Fraunces',serif;font-style:italic;font-size:1.1rem;color:var(--blue-bright);min-height:1.4em;opacity:0;transition:opacity .3s}
+  .whenline.show{opacity:1}
+
+  .alt{background:var(--navy-deep);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .pipe{display:flex;gap:7px;overflow-x:auto;padding-bottom:6px}
+  .pstep{flex:1;min-width:128px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;text-align:center}
+  .pstep .pn{font-family:'JetBrains Mono';font-size:1.5rem;font-weight:600}
+  .pstep .pl{font-size:.78rem;color:var(--muted);margin:5px 0 9px}
+  .pstep .pd{font-family:'JetBrains Mono';font-size:.72rem;color:var(--red)}
+  .pstep.win .pn{color:var(--green)}.pstep.win .pd{color:var(--green)}
+  .pcap{color:var(--muted);font-size:.92rem;margin-top:16px}.pcap .serif{color:var(--blue-bright)}
+
+  .ab{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .abcard{border-radius:14px;padding:24px;border:1px solid var(--line)}
+  .abcard.a{background:var(--blue-soft);border-color:rgba(90,169,224,.45)}.abcard.b{background:var(--card)}
+  .abcard .t{font-family:'JetBrains Mono';font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+  .abcard .big{font-family:'Sora';font-weight:700;font-size:2.4rem;margin:8px 0}.abcard.a .big{color:var(--blue-bright)}
+  .abcard .d{font-size:.9rem;color:var(--muted)}
+  .abverdict{text-align:center;margin-top:20px;font-family:'Sora';font-weight:600;font-size:1.15rem}.abverdict .hl{color:var(--green)}
+
+  .build2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .bcard{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px}
+  .bcard h3{font-size:1.15rem;margin-bottom:14px;display:flex;align-items:center;gap:10px}
+  .bcard h3 .ic{width:32px;height:32px;border-radius:9px;background:var(--blue-soft);display:flex;align-items:center;justify-content:center;color:var(--blue-bright)}
+  .bcard ul{list-style:none;display:flex;flex-direction:column;gap:8px}
+  .bcard li{font-size:.92rem;color:var(--muted);display:flex;gap:9px}.bcard li::before{content:"•";color:var(--blue-bright)}
+
+  .hub{background:#fff;border-radius:13px;overflow:hidden;color:#202124;border:1px solid var(--line)}
+  .hub-bar{background:#f6f8fc;padding:12px 16px;font-size:.88rem;color:#444;font-weight:600;border-bottom:1px solid #e6e9ee}
+  .hub-row{display:grid;grid-template-columns:1.2fr 1fr .8fr 2fr;gap:12px;padding:13px 16px;font-size:.88rem;border-bottom:1px solid #f1f3f4}
+  .hub-row.head{background:#fafbfc;color:#5f6368;font-weight:600;font-size:.74rem;text-transform:uppercase;letter-spacing:.04em}
+  .hub-row .sum{color:#1a8a52;font-style:italic}
+
+  .roi{display:grid;grid-template-columns:1fr 1fr;gap:26px;align-items:center}
+  .roi-inputs{display:flex;flex-direction:column;gap:16px}
+  .ri label{font-size:.84rem;color:var(--muted);display:flex;justify-content:space-between;margin-bottom:6px}
+  .ri label b{color:var(--white);font-family:'JetBrains Mono'}
+  .ri input[type=range]{width:100%;accent-color:var(--blue)}
+  .roi-out{background:linear-gradient(180deg,var(--card),var(--card2));border:1px solid rgba(240,120,140,.4);border-radius:18px;padding:30px;text-align:center}
+  .roi-out .lab{font-family:'JetBrains Mono';font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .roi-out .bleed{font-family:'Sora';font-weight:800;font-size:2.9rem;color:var(--red);margin:10px 0 2px}
+  .roi-out .per{font-size:.84rem;color:var(--muted)}
+  .roi-out .yr{margin-top:16px;padding-top:16px;border-top:1px solid var(--line);font-size:.95rem;color:var(--white)}.roi-out .yr b{color:var(--red)}
+  .roi-out .rec{margin-top:13px;font-family:'Fraunces',serif;font-style:italic;font-size:1.02rem;color:var(--blue-bright)}
+  .roi-note{font-family:'JetBrains Mono';font-size:.68rem;color:var(--dim);margin-top:16px;text-align:center}
+
+  footer{padding:30px 0;text-align:center;color:var(--dim);font-family:'JetBrains Mono';font-size:.74rem;border-top:1px solid var(--line)}
+
+  @media (max-width:920px){
+    .callgrid{grid-template-columns:1fr;gap:24px}
+    .roi,.ab,.build2{grid-template-columns:1fr}
+    .svc-grid{grid-template-columns:1fr 1fr}
+    .hub-row{grid-template-columns:1fr 1fr;font-size:.8rem}
+    .widget{width:300px}
+  }
+  @media (prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap topbrow">
+    <div class="brand">PRISYNC<b>·</b>SOLUTIONS &nbsp;/&nbsp; LIVE DEMO</div>
+    <div class="namebox">
+      <label for="bizInput">Personalised demo for</label>
+      <input id="bizInput" placeholder="their business name…" autocomplete="off" />
+    </div>
+  </div>
+</div>
+
+<div class="wrap hero">
+  <div class="demo-for">Demo for <span class="x" id="xName">your business</span></div>
+  <div class="built">Built for <span class="tsc">TSCR Construction</span> · a potential agent for the <span id="xTeam">your business</span> team.</div>
+</div>
+
+<div class="leakstrip">
+  <div class="wrap">
+    <div class="big">Most trades lose <b>40–60% of leads</b> to missed calls <span class="serif">and</span> burn <b>5+ hours a week</b> just fielding the ones they catch.</div>
+    <div class="sub">↓ here's exactly where it goes, and how the agent stops it</div>
+  </div>
+</div>
+
+<!-- LIVE AGENT -->
+<section>
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Live agent — every channel</span>
+      <h2 style="margin-top:9px">Type to it. It answers, qualifies and books — <span class="serif">like a real person.</span></h2>
+      <p>This is the real agent built for TSCR. Switch the channel; the same conversation can follow the customer wherever they message from.</p>
+    </div>
+
+    <div class="channels" id="channels">
+      <button class="ch-tab active" data-ch="web">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#3b91cf" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>Website</button>
+      <button class="ch-tab" data-ch="whatsapp">
+        <svg viewBox="0 0 24 24" fill="#25D366"><path d="M12 2a10 10 0 0 0-8.6 15l-1.3 4.7 4.8-1.3A10 10 0 1 0 12 2zm0 18a8 8 0 0 1-4.1-1.1l-.3-.2-2.8.7.8-2.7-.2-.3A8 8 0 1 1 12 20zm4.4-6c-.2-.1-1.4-.7-1.6-.8s-.4-.1-.5.1-.6.8-.8 1-.3.2-.5.1a6.5 6.5 0 0 1-3.2-2.8c-.2-.4.2-.4.6-1.2.1-.2 0-.3 0-.5s-.5-1.3-.7-1.7-.4-.4-.5-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.8 11.8 0 0 0 4.5 4c2.1.9 2.1.6 2.5.6a2.7 2.7 0 0 0 1.8-1.3 2.2 2.2 0 0 0 .2-1.3c-.1-.1-.3-.2-.5-.3z"/></svg>WhatsApp</button>
+      <button class="ch-tab" data-ch="instagram">
+        <svg viewBox="0 0 24 24"><defs><linearGradient id="ig" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#f09433"/><stop offset=".5" stop-color="#dc2743"/><stop offset="1" stop-color="#bc1888"/></linearGradient></defs><rect x="2" y="2" width="20" height="20" rx="6" fill="none" stroke="url(#ig)" stroke-width="2"/><circle cx="12" cy="12" r="4.5" fill="none" stroke="url(#ig)" stroke-width="2"/><circle cx="17.5" cy="6.5" r="1.2" fill="url(#ig)"/></svg>Instagram</button>
+      <button class="ch-tab" data-ch="messenger">
+        <svg viewBox="0 0 24 24" fill="#0084FF"><path d="M12 2C6.3 2 2 6.2 2 11.7c0 2.9 1.2 5.4 3.1 7.1V22l2.9-1.6c.8.2 1.6.3 2.5.3h.5C17.7 20.7 22 16.5 22 11.7 22 6.2 17.7 2 12 2zm1 12.6-2.6-2.7L5.5 14.6l5.4-5.7 2.6 2.7 4.9-2.8-5.4 5.8z"/></svg>Messenger</button>
+      <button class="ch-tab" data-ch="sms">
+        <svg viewBox="0 0 24 24" fill="#34c759"><path d="M12 3C6.5 3 2 6.7 2 11.2c0 2.6 1.5 4.9 3.8 6.4-.2.9-.7 2.1-1.5 3.1 1.7-.2 3.4-.9 4.7-1.8.9.2 2 .4 3 .4 5.5 0 10-3.7 10-8.1S17.5 3 12 3z"/></svg>SMS</button>
+      <button class="ch-tab" data-ch="gmail">
+        <svg viewBox="0 0 24 24"><path d="M3 5h18a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z" fill="#fff" stroke="#e0e0e0"/><path d="M3 6l9 7 9-7" fill="none" stroke="#EA4335" stroke-width="2"/></svg>Email</button>
+    </div>
+
+    <div class="stagewrap">
+      <div class="stage" id="stage"></div>
+    </div>
+  </div>
+</section>
+
+<!-- LIVE PHONE -->
+<section class="alt">
+  <div class="wrap">
+    <div class="sec-head"><span class="eyebrow">Live phone agent</span><h2 style="margin-top:9px">Call it yourself, right now.</h2></div>
+    <div class="callgrid">
+      <div class="callphone">
+        <div class="callphone-in">
+          <div class="inc">Incoming · TSCR Construction</div>
+          <div class="cav">A</div>
+          <div class="cnm">Adriana</div>
+          <div class="cco">AI Receptionist</div>
+          <div class="cnum">+1 (447) 445 0219</div>
+          <div class="actions"><div class="act dec">✕</div><div class="act acc">✆</div></div>
+        </div>
+        <div class="callnote">US-prefixed for the demo. On a live build it's a normal UK number on your own line.</div>
+      </div>
+      <div class="calltext">
+        <h3>The same agent, on the phone.</h3>
+        <p class="lead">It answers in a natural voice, qualifies the job, and books it straight into the calendar. <span class="serif">No voicemail, no missed job.</span></p>
+        <ul class="listen">
+          <li>Answers instantly, day or night</li>
+          <li>Qualifies the job and captures the details</li>
+          <li>Books the quotation into the calendar</li>
+          <li>Reschedules or cancels on request</li>
+          <li>Hands to a human if it's ever needed</li>
+        </ul>
+        <div class="whenbox">
+          <div class="q">Be honest — when the phone last rang, what were you doing?</div>
+          <div class="whenchips" id="whenchips">
+            <button class="chip" data-l="Thought so 😏 — that one went to voicemail.">On a job</button>
+            <button class="chip" data-l="With a customer, so the next caller got voicemail. That's the leak.">With a customer</button>
+            <button class="chip" data-l="Driving — can't exactly take a quote at 70mph. The agent could've.">Driving</button>
+            <button class="chip" data-l="Out on a quote, while another one rang out. Adriana would've caught it.">Quoting</button>
+            <button class="chip" data-l="Even off the clock, the phone keeps ringing. Now something answers it.">Off the clock</button>
+          </div>
+          <div class="whenline" id="whenline"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LEAK PIPELINE -->
+<section>
+  <div class="wrap">
+    <div class="sec-head"><span class="eyebrow">Where the money slips</span><h2 style="margin-top:9px">100 leads in. How many become jobs?</h2></div>
+    <div class="pipe">
+      <div class="pstep"><div class="pn">100</div><div class="pl">Leads / enquiries</div><div class="pd">&nbsp;</div></div>
+      <div class="pstep"><div class="pn">59</div><div class="pl">After-hours gap</div><div class="pd">−41 no cover</div></div>
+      <div class="pstep"><div class="pn">45</div><div class="pl">Missed / slow</div><div class="pd">−14 rang next firm</div></div>
+      <div class="pstep"><div class="pn">31</div><div class="pl">Followed up in time</div><div class="pd">−14 went cold</div></div>
+      <div class="pstep win"><div class="pn">~9</div><div class="pl">Booked jobs</div><div class="pd">the survivors</div></div>
+    </div>
+    <p class="pcap">Every red number is a job you paid to win and <span class="serif">never knew you lost.</span> The agent catches them before they ring the next firm.</p>
+  </div>
+</section>
+
+<!-- A VS B -->
+<section class="alt">
+  <div class="wrap">
+    <div class="sec-head"><span class="eyebrow">Same leads, two outcomes</span><h2 style="margin-top:9px">Who wins over 3 months?</h2></div>
+    <div class="ab">
+      <div class="abcard a"><div class="t">Company A — with AI agent</div><div class="big">90% captured</div><div class="d">Every call and message answered, qualified, booked. ~54 jobs a month.</div></div>
+      <div class="abcard b"><div class="t">Company B — manual only</div><div class="big">55% captured</div><div class="d">Misses after-hours and busy-hour calls. ~33 jobs a month.</div></div>
+    </div>
+    <div class="abverdict">Over 3 months that's <span class="hl">~63 more jobs</span> — tens of thousands in revenue, off the same leads.</div>
+  </div>
+</section>
+
+<!-- WHAT WE BUILD -->
+<section>
+  <div class="wrap">
+    <div class="sec-head"><span class="eyebrow">What gets built</span><h2 style="margin-top:9px">Two pieces. One front desk that <span class="serif">never sleeps.</span></h2></div>
+    <div class="build2">
+      <div class="bcard"><h3><span class="ic">✆</span>24/7 Phone Agent</h3><ul><li>Answers every call, day or night</li><li>Qualifies the job</li><li>Books straight into your calendar</li><li>Texts back to confirm</li><li>Logs the lead, hands to a human if needed</li></ul></div>
+      <div class="bcard"><h3><span class="ic">✦</span>Multi-channel Chat Agent</h3><ul><li>Website, WhatsApp, Instagram, Messenger, SMS</li><li>Instant answers in your voice</li><li>Captures and qualifies the enquiry</li><li>Books the slot</li><li>One conversation, every channel</li></ul></div>
+    </div>
+  </div>
+</section>
+
+<!-- HUB -->
+<section class="alt">
+  <div class="wrap">
+    <div class="sec-head"><span class="eyebrow">From calls to insight</span><h2 style="margin-top:9px">Every conversation, logged and summarised.</h2></div>
+    <div class="hub">
+      <div class="hub-bar">📋 TSCR — Lead Log (flows into your CRM of choice)</div>
+      <div class="hub-row head"><div>Name / Contact</div><div>Reason</div><div>Booked</div><div>AI summary</div></div>
+      <div class="hub-row"><div>James Walker · 07700 123456</div><div>Roof replacement</div><div>Thu 10:00</div><div class="sum">"Roof patched several times, wants a full replacement. Quotation booked."</div></div>
+      <div class="hub-row"><div>S. Okafor · 07911 998877</div><div>Loft conversion</div><div>Fri 14:30</div><div class="sum">"Dormer loft for a master bedroom, North Finchley. Keen to start in 1–3 months."</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ROI -->
+<section>
+  <div class="wrap">
+    <div class="sec-head"><span class="eyebrow">The leak, in your numbers</span><h2 style="margin-top:9px">What is this costing you a month?</h2></div>
+    <div class="roi">
+      <div class="roi-inputs">
+        <div class="ri"><label>Leads / enquiries per week <b id="vLeads">0</b></label><input type="range" id="leads" min="0" max="60" value="0"></div>
+        <div class="ri"><label>Average job value <b id="vValue">£0</b></label><input type="range" id="value" min="0" max="40000" step="500" value="0"></div>
+        <div class="ri"><label>% missed or too slow <b id="vMiss">0%</b></label><input type="range" id="miss" min="0" max="70" value="0"></div>
+        <div class="ri"><label>Close rate on caught leads <b id="vClose">0%</b></label><input type="range" id="close" min="0" max="80" value="0"></div>
+      </div>
+      <div class="roi-out">
+        <div class="lab">Walking out the door</div>
+        <div class="bleed" id="bleedMo">£0</div>
+        <div class="per">per month in jobs you're currently losing</div>
+        <div class="yr">That's <b id="bleedYr">£0</b> a year</div>
+        <div class="rec" id="recLine">Slide your numbers across.</div>
+        <div class="roi-note">Illustrative, based on your inputs. Real results vary by lead quality and follow-up.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>PRISYNC · SOLUTIONS — demo.prisyncsolutions.com · live demo, not a customer claim</footer>
+
+<script>
+const bizInput=document.getElementById('bizInput');
+function stamp(){const v=bizInput.value.trim()||'your business';document.getElementById('xName').textContent=v;document.getElementById('xTeam').textContent=v;}
+bizInput.addEventListener('input',stamp);
+
+/* ---- conversation state ---- */
+let messages=[];
+const greeting="Hi there! 👋 You're through to Adriana at TSCR Construction. I can answer anything about our work or get you booked for a free quotation. How can I help?";
+
+/* canned fallback so it never visibly breaks */
+function fallback(raw){
+  const t=raw.toLowerCase();
+  if(/(book|quote|appointment|visit)/.test(t)) return "Of course — I can get a free quotation booked in. Could I take your full name to start?";
+  if(/(price|cost|how much)/.test(t)) return "Every project's unique, so we quote on the property — fixed price, no hidden costs. Want me to book a free quotation for an exact figure?";
+  if(/(area|cover|where|location)/.test(t)) return "We cover all of North London — Barnet, Enfield, Harrow, Finchley, Herts and Essex. Whereabouts are you?";
+  if(/(hour|open|when|availab)/.test(t)) return "We're open Mon 9–7 and Tue–Fri 8–7, closed weekends. I can usually book a quotation within a few days — shall I?";
+  return "Happy to help with that — the easiest thing is a free quotation so we can take a proper look. Want me to book one in?";
+}
+
+async function getReply(){
+  try{
+    const r=await fetch('/api/chat',{method:'POST',headers:{'content-type':'application/json'},
+      body:JSON.stringify({messages,business:bizInput.value.trim()})});
+    if(!r.ok) throw 0;
+    const d=await r.json();
+    if(!d.text) throw 0;
+    return d.text;
+  }catch(e){
+    const last=messages.filter(m=>m.role==='user').slice(-1)[0];
+    return fallback(last?last.text:'');
+  }
+}
+
+/* ---- channel rendering ---- */
+let channel='web';
+const stage=document.getElementById('stage');
+function escapeHtml(s){return s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
+function bubbles(){return messages.map(m=>`<div class="msg ${m.role}">${escapeHtml(m.text)}</div>`).join('');}
+function composerHTML(){return `<div class="composer"><input id="composer" placeholder="Type a message…" autocomplete="off"/><button id="sendBtn">↑</button></div>`;}
+function appHead(sub){return `<div class="app-head"><div class="av">A</div><div><div class="nm">Adriana · TSCR</div><div class="st">${sub}</div></div></div>`;}
+
+function render(){
+  let html='';
+  if(channel==='web'){
+    html=`<div class="browser"><div class="browser-bar"><i></i><i></i><i></i><div class="browser-url">tscr.co.uk</div></div>
+      <div class="site">
+        <div class="site-nav"><div class="logo">TSCR <span>Construction</span></div><div class="menu"><span>Lofts</span><span>Extensions</span><span>Renovations</span><span>New Builds</span><span>Contact</span></div></div>
+        <div class="site-hero"><div class="badge">North London · 30+ years</div><h2>Comprehensive design &amp; build, from inception to completion.</h2><p>Loft conversions, extensions and renovations across North London — fixed-price, fully guaranteed.</p><div class="btns"><a class="b1">Free quotation</a><a class="b2">Our work</a></div></div>
+        <div class="site-trust"><span><span class="tick">✓</span> FMB Member</span><span><span class="tick">✓</span> TrustMark</span><span><span class="tick">✓</span> Checkatrade</span><span><span class="tick">✓</span> 10-year guarantee</span></div>
+        <div class="site-services"><h3>What we do</h3><div class="svc-grid">
+          <div class="svc"><b>Loft Conversions</b><p>Dormer, Velux, hip-to-gable, mansard.</p></div>
+          <div class="svc"><b>Home Extensions</b><p>Rear, side, kitchen, double-storey.</p></div>
+          <div class="svc"><b>Renovations</b><p>Full refurbishments and finishing.</p></div>
+          <div class="svc"><b>New Builds</b><p>Ground-up design and build.</p></div>
+        </div></div>
+        <div class="site-foot">TSCR Construction · 86–90 Paul Street, London EC2A 4NE · contact@tscr.co.uk</div>
+      </div>
+      <div class="widget"><div class="widget-head"><div class="av">A</div><div><div class="nm">Adriana</div><div class="st"><i></i>Online now</div></div></div>
+        <div class="thread" id="thread">${bubbles()}</div>${composerHTML()}</div></div>`;
+    stage.className='stage web';
+  }else if(channel==='gmail'){
+    html=`<div class="emailframe"><div class="email-bar">📧 Inbox · TSCR Construction</div><div class="email-subj">Re: Your enquiry — TSCR Construction</div><div class="thread" id="thread">${bubbles()}</div>${composerHTML()}</div>`;
+    stage.className='stage gmail';
+  }else{
+    const subs={whatsapp:'online',instagram:'Active now',messenger:'Active now',sms:'Text Message'};
+    html=`<div class="phoneframe"><div class="phone-inner">${appHead(subs[channel])}<div class="thread" id="thread">${bubbles()}</div>${composerHTML()}</div></div>`;
+    stage.className='stage '+channel;
+  }
+  stage.innerHTML=html;
+  const th=document.getElementById('thread'); if(th) th.scrollTop=th.scrollHeight;
+  wire();
+}
+function wire(){
+  const inp=document.getElementById('composer'),btn=document.getElementById('sendBtn');
+  if(!inp)return; btn.onclick=send; inp.onkeydown=e=>{if(e.key==='Enter')send();}; inp.focus();
+}
+let busy=false;
+async function send(){
+  const inp=document.getElementById('composer'); if(!inp||busy)return;
+  const v=inp.value.trim(); if(!v)return;
+  messages.push({role:'user',text:v}); inp.value=''; busy=true; render();
+  const th=document.getElementById('thread');
+  const typing=document.createElement('div'); typing.className='typing'; typing.innerHTML='<span></span><span></span><span></span>';
+  th.appendChild(typing); th.scrollTop=th.scrollHeight;
+  const reply=await getReply();
+  messages.push({role:'bot',text:reply}); busy=false; render();
+}
+document.querySelectorAll('.ch-tab').forEach(tab=>{tab.onclick=()=>{document.querySelectorAll('.ch-tab').forEach(t=>t.classList.remove('active'));tab.classList.add('active');channel=tab.dataset.ch;render();};});
+messages.push({role:'bot',text:greeting}); render();
+
+/* ---- "when I called" chips ---- */
+document.querySelectorAll('#whenchips .chip').forEach(c=>{
+  c.onclick=()=>{
+    document.querySelectorAll('#whenchips .chip').forEach(x=>x.classList.remove('active'));
+    c.classList.add('active');
+    const line=document.getElementById('whenline');
+    line.textContent=c.dataset.l; line.classList.add('show');
+  };
+});
+
+/* ---- ROI ---- */
+function fmt(n){return '£'+Math.round(n).toLocaleString('en-GB');}
+function calcROI(){
+  const L=+leads.value,V=+value.value,M=+miss.value/100,C=+close.value/100;
+  vLeads.textContent=L; vValue.textContent=fmt(V); vMiss.textContent=Math.round(M*100)+'%'; vClose.textContent=Math.round(C*100)+'%';
+  const jobsMo=L*4.33*M*C, bleed=jobsMo*V;
+  bleedMo.textContent=fmt(bleed); bleedYr.textContent=fmt(bleed*12);
+  if(bleed<=0){recLine.textContent='Slide your numbers across.';}
+  else{const j=jobsMo>=1?Math.round(jobsMo):jobsMo.toFixed(1);recLine.textContent=`~${j} recoverable jobs a month. One pays for the whole build.`;}
+}
+['leads','value','miss','close'].forEach(id=>document.getElementById(id).addEventListener('input',calcROI));
+const leads=document.getElementById('leads'),value=document.getElementById('value'),miss=document.getElementById('miss'),close=document.getElementById('close');
+const vLeads=document.getElementById('vLeads'),vValue=document.getElementById('vValue'),vMiss=document.getElementById('vMiss'),vClose=document.getElementById('vClose');
+const bleedMo=document.getElementById('bleedMo'),bleedYr=document.getElementById('bleedYr'),recLine=document.getElementById('recLine');
+calcROI(); stamp();
+</script>
+</body>
+</html>
